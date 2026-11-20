@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>KomodoCap · Performance en euros</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Space+Grotesk:wght@500;600&display=swap">
+<style>
+/* Mise en page : un fond bleu nuit, des chiffres clés, puis les graphiques et tableaux.
+   Règle de couleur unique : cyan = compte, orange = Euro Stoxx 50, blanc = tout le reste. */
+:root{
+  --bg:#070e24;
+  --panel:#0e1938;
+  --panel-edge:#1c2c5c;
+  --fg:#e8eeff;
+  --muted:#8b9bc8;
+  --grid:rgba(139,155,200,.12);
+  --acct:#3de6ff;
+  --idx:#ff9d5c;
+  --font-display:"Space Grotesk",system-ui,sans-serif;
+  --font-body:"Inter",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  min-height:100vh;
+  background:var(--bg);
+  background-image:radial-gradient(900px 420px at 80% -10%,rgba(61,230,255,.10),transparent 70%),radial-gradient(700px 400px at -10% 30%,rgba(80,110,255,.12),transparent 70%);
+  background-repeat:no-repeat;
+  color:var(--fg);
+  font-family:var(--font-body);
+  font-size:15px;
+  line-height:1.55;
+  padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px));
+  padding-block:max(20px,env(safe-area-inset-top,0px)) max(48px,env(safe-area-inset-bottom,0px));
+}
+main{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:16px;border-bottom:1px solid var(--panel-edge);position:relative}
+.brand{font-family:var(--font-display);font-weight:600;font-size:22px;letter-spacing:.02em;color:var(--fg)}
+.menu-btn{display:inline-flex;align-items:center;gap:9px;font:inherit;font-family:var(--font-display);font-weight:500;font-size:14px;color:var(--fg);background:var(--panel);border:1px solid var(--panel-edge);border-radius:10px;padding:9px 14px;cursor:pointer}
+.menu-btn:hover{border-color:var(--acct)}
+.menu-btn:focus-visible,.menu-panel a:focus-visible{outline:2px solid var(--acct);outline-offset:2px}
+.menu-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.menu-panel{position:absolute;right:0;top:calc(100% + 8px);z-index:20;width:min(320px,calc(100vw - 32px));background:var(--panel);border:1px solid var(--panel-edge);border-radius:12px;padding:6px;display:flex;flex-direction:column;gap:2px}
+.menu-panel[hidden]{display:none}
+.menu-panel a{display:flex;flex-direction:column;gap:1px;padding:11px 12px;border-radius:8px;color:var(--fg);text-decoration:none;font-family:var(--font-display);font-weight:500;font-size:15px}
+.menu-panel a span{font-family:var(--font-body);font-weight:400;font-size:12.5px;color:var(--muted)}
+.menu-panel a:hover{background:rgba(139,155,200,.12)}
+.menu-panel a[]{background:rgba(61,230,255,.10);color:var(--acct)}
+header{display:flex;flex-direction:column;gap:6px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--font-display);font-weight:600;font-size:clamp(26px,4.4vw,38px);line-height:1.1;margin:0;letter-spacing:-.01em;text-wrap:balance}
+.sub{color:var(--muted);margin:0;max-width:62ch}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.kpi{background:var(--panel);border:1px solid var(--panel-edge);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.kpi .l{font-size:12px;color:var(--muted);letter-spacing:.04em}
+.kpi .v{font-family:var(--font-display);font-weight:600;font-size:30px;font-variant-numeric:tabular-nums;line-height:1.2;color:var(--fg)}
+.kpi .n{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.v.a{color:var(--acct)} .v.i{color:var(--idx)}
+.card{background:var(--panel);border:1px solid var(--panel-edge);border-radius:14px;padding:18px 18px 12px;min-width:0}
+.card-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px 20px;margin-bottom:10px}
+h2{font-family:var(--font-display);font-weight:500;font-size:17px;margin:0}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12.5px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:7px}
+.sw{width:18px;height:0;border-top:3px solid var(--acct);border-radius:2px}
+.sw.d{border-top-color:var(--idx)}
+.wrap{position:relative;width:100%}
+.w1{height:340px}.w2{height:210px}
+.note{font-size:12.5px;color:var(--muted);margin:0;max-width:78ch}
+.tbl{overflow-x:auto}
+.ratios{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.ratios th,.ratios td{padding:11px 8px;text-align:right;border-bottom:1px solid var(--panel-edge)}
+.ratios thead th{font-family:var(--font-display);font-weight:500;font-size:13px;color:var(--muted)}
+.ratios th:first-child,.ratios td:first-child{text-align:left}
+.ratios td{font-family:var(--font-display);font-weight:500;font-size:16px;color:var(--fg)}
+.ratios td:first-child{font-family:var(--font-body);font-weight:400;font-size:15px;color:var(--muted)}
+.ratios td.a{color:var(--acct);font-weight:600}
+.ratios td.i{color:var(--idx);font-weight:600}
+.ratios td.na{color:var(--muted);font-weight:400}
+.ratios .sub{display:block;font-family:var(--font-body);font-size:12px;font-weight:400;color:var(--muted);max-width:none}
+.ratios tbody tr:last-child td{border-bottom:0}
+.ratios tr.tot td{border-top:1px solid var(--muted)}
+.ratios tr.tot td:first-child{color:var(--fg);font-weight:500}
+@media (max-width:520px){.w1{height:280px}.kpi .v{font-size:26px}}
+</style>
+</head>
+<body>
+<main>
+  <div class="topbar">
+    <div class="brand">KomodoCap</div>
+    <div>
+      <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="menuPanel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>Menu</button>
+      <nav class="menu-panel" id="menuPanel" aria-label="Pages" hidden><a href="https://komodocap.github.io/performances" aria-current="page">Performance Totale<span>Euros · courbes, tableaux et ratios depuis le 1er juillet</span></a><a href="https://komodocap.github.io/performances/stoxxonly">Performance sur Indice - FESX / FSXE<span>Euros · courbes, tableaux et ratios depuis le 9 juillet</span></a></nav>
+    </div>
+  </div>
+  <header>
+    <div class="eyebrow">1er juillet – 17 novembre 2026 · base 100 · en euros</div>
+    <h1>Performance totale contre Euro Stoxx 50</h1>
+    <p class="sub">Performance chaînée du compte convertie en euros jour par jour, dépôts neutralisés, comparée à l'indice sur les mêmes séances. La courbe ne dépend plus du cours EUR/USD. Comporte l'ensemble des transactions sur Eurostoxx 50 et Obligations.</p>
+  </header>
+
+  <section class="kpis" aria-label="Chiffres clés">
+    <div class="kpi"><span class="l">Compte</span><span class="v a" id="k1">+38,7 %</span><span class="n">drawdown max −4,1 %</span></div>
+    <div class="kpi"><span class="l">Euro Stoxx 50</span><span class="v i" id="k2">−1,1 %</span><span class="n">drawdown max −7,4 %</span></div>
+    <div class="kpi"><span class="l">Écart de performance</span><span class="v" id="k3">+39,8 pts</span><span class="n">base 100 au 01/07</span></div>
+    <div class="kpi"><span class="l">Corrélation quotidienne</span><span class="v" id="k4">−0,20</span><span class="n">bêta −0,33</span></div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <h2>Évolution base 100</h2>
+      <div class="legend"><span><i class="sw"></i>Compte</span><span><i class="sw d"></i>Euro Stoxx 50</span></div>
+    </div>
+    <div class="wrap w1"><canvas id="c1" role="img" aria-label="Compte et Euro Stoxx 50 en base 100 au 1er juillet 2026">Le compte atteint 138,7 le 17 novembre contre 98,9 pour l'Euro Stoxx 50.</canvas></div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <h2>Drawdown depuis le dernier sommet</h2>
+      <div class="legend"><span><i class="sw"></i>Compte</span><span><i class="sw d"></i>Euro Stoxx 50</span></div>
+    </div>
+    <div class="wrap w2"><canvas id="c2" role="img" aria-label="Drawdown du compte et de l'Euro Stoxx 50">Drawdown maximal de −4,1 % pour le compte et de −7,4 % pour l'indice.</canvas></div>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h2>Performance mois par mois</h2></div>
+    <div class="tbl"><table class="ratios">
+      <thead><tr><th></th><th>Compte</th><th>Euro Stoxx 50</th><th>Écart</th></tr></thead>
+      <tbody>
+        <tr><td>Juillet</td><td class="a">+19,82 %</td><td class="i">+1,20 %</td><td>+18,62 pts</td></tr>
+        <tr><td>Août</td><td class="a">+3,45 %</td><td class="i">+0,98 %</td><td>+2,47 pts</td></tr>
+        <tr><td>Septembre</td><td class="a">+3,63 %</td><td class="i">−2,35 %</td><td>+5,98 pts</td></tr>
+        <tr><td>Octobre</td><td class="a">+3,74 %</td><td class="i">−2,20 %</td><td>+5,94 pts</td></tr>
+        <tr><td>Novembre (au 17)</td><td class="a">+4,09 %</td><td class="i">+1,32 %</td><td>+2,77 pts</td></tr>
+        <tr class="tot"><td>Total depuis le 1er juillet</td><td class="a">+38,70 %</td><td class="i">−1,12 %</td><td>+39,82 pts</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h2>Ratios ajustés du risque</h2></div>
+    <div class="tbl"><table class="ratios">
+      <thead><tr><th></th><th>Compte</th><th>Euro Stoxx 50</th></tr></thead>
+      <tbody>
+        <tr><td>Ratio de Sharpe</td><td class="a">3,93</td><td class="i">−0,15</td></tr>
+        <tr><td>Ratio de Sortino</td><td class="a">8,46</td><td class="i">−0,20</td></tr>
+        <tr><td>Volatilité annualisée</td><td class="a">21,8 %</td><td class="i">13,5 %</td></tr>
+        <tr><td>Volatilité à la baisse annualisée</td><td class="a">10,1 %</td><td class="i">9,8 %</td></tr>
+        <tr><td>Séances positives</td><td class="a">81,8 %</td><td class="i">53,5 %</td></tr>
+        <tr><td>Facteur de récupération</td><td class="a">5,88</td><td class="na">n/a</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h2>Statistiques de trades</h2></div>
+    <div class="tbl"><table class="ratios">
+      <thead><tr><th></th><th>Du 1er juillet au 17 novembre</th></tr></thead>
+      <tbody>
+        <tr><td>Nombre de trades</td><td class="a">117<span class="sub">relevés détaillés dès le 7 juillet</span></td></tr>
+        <tr><td>Trades gagnants / perdants</td><td class="a">93 / 24<span class="sub">79,5 % de gagnants · ratio 3,88</span></td></tr>
+        <tr><td>Meilleur jour</td><td class="a">+450,67 €<span class="sub">3 juil · +8,97 % du capital</span></td></tr>
+        <tr><td>Pire jour</td><td class="a">−334,31 €<span class="sub">8 oct · −4,10 % du capital</span></td></tr>
+        <tr><td>Profit factor</td><td class="a">2,59<span class="sub">gains cumulés ÷ pertes cumulées</span></td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <p class="note">Compte : valeur liquidative du compte (USD) reconvertie en euros chaque jour au cours EUR/USD indiqué sur les relevés AMP, la trésorerie du compte étant détenue pour l'essentiel en euros ; les dépôts sont convertis au cours du jour. Rendement quotidien = (equity − equity de la veille − dépôt) ÷ (equity de la veille + dépôt), en euros, chaîné. Les deux séries sont en base 100 à la clôture du 1er juillet 2026, date du premier relevé du compte. Le cours EUR/USD figure sur 80 des 100 séances ; pour les 20 autres (dont les 1er au 6 juillet), il est interpolé entre les relevés voisins, ce qui peut déplacer légèrement certaines variations quotidiennes. Les performances mensuelles sont chaînées à partir des rendements quotidiens, dépôts neutralisés pour le compte ; l'écart est la différence entre les deux, en points. Ratios calculés sur les 99 rendements quotidiens du 2 juillet au 17 novembre, annualisés sur 252 séances, taux sans risque et seuil de Sortino à 0 %. Sur une période aussi courte, ces ratios sont à lire comme des ordres de grandeur. Facteur de récupération : gain net du compte (+2 205 €, dépôts exclus) divisé par le drawdown maximal en euros (−375 €, du 6 nov au 11 nov). Statistiques de trades : un trade est une position complète sur un contrat, de l'ouverture à la remise à plat, reconstituée à partir des exécutions des relevés. Les relevés détaillés commencent le 7 juillet : les 117 trades clôturés entre le 7 juillet et le 17 novembre sont comptés, mais ceux des 1er au 6 juillet n'apparaissent pas. Les résultats sont nets de commissions et frais de bourse. Meilleur et pire jour : variation quotidienne du capital en euros depuis le 1er juillet, dépôts exclus.</p>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const labels=["01/07", "02/07", "03/07", "06/07", "07/07", "08/07", "09/07", "10/07", "13/07", "14/07", "15/07", "16/07", "17/07", "20/07", "21/07", "22/07", "23/07", "24/07", "27/07", "28/07", "29/07", "30/07", "31/07", "03/08", "04/08", "05/08", "06/08", "07/08", "10/08", "11/08", "12/08", "13/08", "14/08", "17/08", "18/08", "19/08", "20/08", "21/08", "24/08", "25/08", "26/08", "27/08", "28/08", "31/08", "01/09", "02/09", "03/09", "04/09", "07/09", "08/09", "09/09", "10/09", "11/09", "14/09", "15/09", "16/09", "17/09", "18/09", "21/09", "22/09", "23/09", "24/09", "25/09", "28/09", "29/09", "30/09", "01/10", "02/10", "05/10", "06/10", "07/10", "08/10", "09/10", "12/10", "13/10", "14/10", "15/10", "16/10", "19/10", "20/10", "21/10", "22/10", "23/10", "26/10", "27/10", "28/10", "29/10", "30/10", "02/11", "03/11", "04/11", "05/11", "06/11", "09/11", "10/11", "11/11", "12/11", "13/11", "16/11", "17/11"];
+const acc=[100.0, 96.04, 104.66, 105.22, 111.21, 115.56, 116.2, 116.3, 116.57, 116.84, 117.15, 117.42, 117.51, 117.78, 118.34, 118.76, 119.13, 118.82, 118.55, 118.52, 119.47, 119.97, 119.82, 119.03, 119.03, 119.37, 119.66, 119.32, 119.16, 119.71, 120.27, 120.58, 120.75, 121.08, 121.34, 121.6, 121.99, 122.09, 122.32, 122.62, 123.01, 123.36, 123.41, 123.95, 123.22, 123.3, 123.6, 123.5, 124.0, 124.38, 124.65, 124.71, 124.9, 124.96, 125.42, 125.8, 126.08, 125.92, 126.39, 126.68, 126.97, 127.38, 127.53, 127.89, 128.17, 128.45, 129.17, 129.41, 129.66, 130.68, 131.42, 126.04, 126.8, 127.24, 127.67, 128.21, 128.5, 128.77, 129.42, 130.05, 130.5, 131.03, 131.34, 132.16, 133.3, 133.45, 133.64, 133.26, 133.69, 133.91, 133.89, 134.93, 134.97, 132.49, 131.72, 129.43, 129.72, 131.42, 133.94, 138.7];
+const ix=[100.0, 101.24, 102.07, 101.84, 100.59, 98.76, 100.03, 99.8, 99.82, 99.96, 99.73, 100.02, 99.18, 99.12, 100.05, 100.55, 98.85, 99.98, 100.0, 100.11, 99.46, 100.99, 101.2, 102.29, 103.25, 103.1, 103.5, 103.84, 104.03, 104.28, 104.0, 104.19, 104.09, 103.95, 102.96, 102.58, 102.22, 102.86, 102.63, 102.76, 103.0, 102.26, 103.23, 102.19, 101.38, 101.27, 101.59, 101.76, 101.93, 102.08, 100.46, 99.78, 100.68, 99.65, 99.27, 99.75, 100.64, 99.26, 100.57, 100.67, 100.28, 99.84, 100.32, 100.3, 100.6, 99.79, 98.3, 99.3, 99.36, 99.84, 98.37, 97.52, 98.26, 98.71, 98.16, 98.53, 98.18, 98.75, 97.81, 97.44, 98.81, 96.89, 96.59, 97.35, 98.12, 98.17, 98.8, 97.59, 98.31, 97.8, 99.73, 99.19, 98.22, 100.13, 100.72, 101.77, 101.85, 101.66, 101.05, 98.88];
+const ddf=s=>{let pk=0;return s.map(x=>{if(x==null)return null;pk=Math.max(pk,x);return Math.round((x/pk-1)*10000)/100;});};
+const dA=ddf(acc),dI=ddf(ix);
+const fr=(v,d=2)=>v.toLocaleString('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const C={acct:'#3de6ff',idx:'#ff9d5c',grid:'rgba(139,155,200,0.12)',tick:'#8b9bc8'};
+Chart.defaults.font.family='Inter, system-ui, sans-serif';
+Chart.defaults.color=C.tick;
+
+const gradFill=(color,top,bottom)=>ctx=>{
+  const a=ctx.chart.chartArea; if(!a) return 'transparent';
+  const g=ctx.chart.ctx.createLinearGradient(0,a.top,0,a.bottom);
+  g.addColorStop(0,top);g.addColorStop(1,bottom);return g;
+};
+const tip={backgroundColor:'#0b1635',borderColor:'#2a3d78',borderWidth:1,titleColor:'#e8eeff',bodyColor:'#c9d5ff',padding:10,cornerRadius:8,boxPadding:4,usePointStyle:true};
+const crosshair={id:'crosshair',afterDatasetsDraw(c){
+  const t=c.tooltip; if(!t||!t.getActiveElements().length) return;
+  const x=t.getActiveElements()[0].element.x,a=c.chartArea,g=c.ctx;
+  g.save();g.strokeStyle='rgba(232,238,255,.25)';g.lineWidth=1;g.setLineDash([3,3]);
+  g.beginPath();g.moveTo(x,a.top);g.lineTo(x,a.bottom);g.stroke();g.restore();}};
+const endDot=color=>({id:'endDot'+color,afterDatasetsDraw(c){
+  const i=c.data.datasets.findIndex(d=>d.borderColor===color); if(i<0) return;
+  const m=c.getDatasetMeta(i),p=m.data[m.data.length-1],g=c.ctx;
+  g.save();g.fillStyle=color;g.strokeStyle='#0e1938';g.lineWidth=2;
+  g.beginPath();g.arc(p.x,p.y,5,0,Math.PI*2);g.fill();g.stroke();g.restore();}});
+const base=(yopts,showX)=>({responsive:true,maintainAspectRatio:false,layout:{padding:{top:8,right:10,left:2}},
+  interaction:{mode:'index',intersect:false},
+  plugins:{legend:{display:false},tooltip:Object.assign({},tip,{callbacks:yopts.cb})},
+  scales:{x:{grid:{display:false},border:{color:'#1c2c5c'},ticks:showX?{color:C.tick,autoSkip:true,maxTicksLimit:12,maxRotation:0,font:{size:11}}:{display:false}},
+          y:Object.assign({grid:{color:C.grid},border:{display:false},ticks:Object.assign({color:C.tick,font:{size:11}},yopts.ticks||{})}, yopts.scale)}});
+
+new Chart(document.getElementById('c1'),{type:'line',
+  data:{labels,datasets:[
+    {label:'Compte',data:acc,borderColor:C.acct,borderWidth:2.5,tension:.25,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:C.acct,fill:'origin',backgroundColor:gradFill(C.acct,'rgba(61,230,255,0.32)','rgba(61,230,255,0)')},
+    {label:'Euro Stoxx 50',data:ix,borderColor:C.idx,borderWidth:2.5,tension:.25,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:C.idx,fill:false}]},
+  options:base({scale:{min:94,max:144},cb:{label:c=>' '+c.dataset.label+' : '+fr(c.parsed.y)}},true),
+  plugins:[crosshair,endDot(C.acct),endDot(C.idx)]});
+
+new Chart(document.getElementById('c2'),{type:'line',
+  data:{labels,datasets:[
+    {label:'Compte',data:dA,borderColor:C.acct,borderWidth:2.5,tension:.2,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:C.acct,fill:'origin',backgroundColor:gradFill(C.acct,'rgba(61,230,255,0)','rgba(61,230,255,0.30)')},
+    {label:'Euro Stoxx 50',data:dI,borderColor:C.idx,borderWidth:2.5,tension:.2,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:C.idx,fill:false}]},
+  options:base({scale:{min:-8,max:0},ticks:{callback:v=>v+' %'},cb:{label:c=>' '+c.dataset.label+' : '+fr(c.parsed.y)+' %'}},true),
+  plugins:[crosshair]});
+</script>
+<script>
+(function(){
+  var b=document.getElementById('menuBtn'),p=document.getElementById('menuPanel');
+  function set(o){p.hidden=!o;b.setAttribute('aria-expanded',o?'true':'false');}
+  b.addEventListener('click',function(e){e.stopPropagation();set(p.hidden);});
+  document.addEventListener('click',function(e){if(!p.hidden&&!p.contains(e.target))set(false);});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!p.hidden){set(false);b.focus();}});
+})();
+</script>
+</body>
+</html>
