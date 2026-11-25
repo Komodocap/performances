@@ -6,19 +6,25 @@
 <title>KomodoCap · Performance en euros depuis le 9 juillet</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Space+Grotesk:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=Space+Grotesk:wght@500;600;700&display=swap">
 <style>
 /* Mise en page : un fond bleu nuit, des chiffres clés, puis les graphiques et tableaux.
-   Règle de couleur unique : cyan = compte, orange = Euro Stoxx 50, blanc = tout le reste. */
+   Règle de couleur unique : chiffres positifs en sable, négatifs en orange. */
 :root{
-  --bg:#070e24;
-  --panel:#0e1938;
-  --panel-edge:#1c2c5c;
-  --fg:#e8eeff;
-  --muted:#8b9bc8;
-  --grid:rgba(139,155,200,.12);
-  --acct:#3de6ff;
-  --idx:#ff9d5c;
+  --bg:#0e2a2b;
+  --sand:#0e2a2b;
+  --ink:#f3f5f1;
+  --pos:#ede8d8;
+  --neg:#d14a22;
+  --ink2:#a3b2ac;
+  --line:#2b5453;
+  --panel:#16393a;
+  --panel-edge:#2b5453;
+  --fg:#f3f5f1;
+  --muted:#a3b2ac;
+  --grid:rgba(163,178,172,.12);
+  --acct:#ede8d8;
+  --idx:#f28b65;
   --font-display:"Space Grotesk",system-ui,sans-serif;
   --font-body:"Inter",system-ui,sans-serif;
   color-scheme:dark;
@@ -27,49 +33,51 @@
 html,body{margin:0}
 body{
   min-height:100vh;
-  background:var(--bg);
-  background-image:radial-gradient(900px 420px at 80% -10%,rgba(61,230,255,.10),transparent 70%),radial-gradient(700px 400px at -10% 30%,rgba(80,110,255,.12),transparent 70%);
+  background:var(--sand);
+  background-image:radial-gradient(900px 420px at 80% -10%,rgba(209,74,34,.07),transparent 70%),radial-gradient(700px 400px at -10% 30%,rgba(27,107,102,.09),transparent 70%);
   background-repeat:no-repeat;
-  color:var(--fg);
+  color:var(--ink);
   font-family:var(--font-body);
   font-size:15px;
   line-height:1.55;
-  padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px));
-  padding-block:max(20px,env(safe-area-inset-top,0px)) max(48px,env(safe-area-inset-bottom,0px));
+  padding-block:0 max(48px,env(safe-area-inset-bottom,0px));
 }
-main{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:16px;border-bottom:1px solid var(--panel-edge);position:relative}
-.brand{font-family:var(--font-display);font-weight:600;font-size:22px;letter-spacing:.02em;color:var(--fg)}
-.menu-btn{display:inline-flex;align-items:center;gap:9px;font:inherit;font-family:var(--font-display);font-weight:500;font-size:14px;color:var(--fg);background:var(--panel);border:1px solid var(--panel-edge);border-radius:10px;padding:9px 14px;cursor:pointer}
-.menu-btn:hover{border-color:var(--acct)}
-.menu-btn:focus-visible,.menu-panel a:focus-visible{outline:2px solid var(--acct);outline-offset:2px}
+main{max-width:1032px;margin:0 auto;display:flex;flex-direction:column;gap:20px;padding:max(24px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px))}
+.kc{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px max(calc((100% - 1000px)/2),max(16px,env(safe-area-inset-left,0px)));padding-right:max(calc((100% - 1000px)/2),max(16px,env(safe-area-inset-right,0px)));background-color:#0E2A2B;color:#EDE8D8;isolation:isolate;border-bottom:3px solid #E4572E;position:relative}
+.kc::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:radial-gradient(circle at 100% 100%,transparent 0 11px,rgba(237,232,216,.12) 11.5px 12.5px,transparent 13px),radial-gradient(circle at 0 100%,transparent 0 11px,rgba(237,232,216,.12) 11.5px 12.5px,transparent 13px);background-size:28px 28px;background-position:0 0,14px 14px;-webkit-mask-image:linear-gradient(90deg,transparent 0,transparent 28%,#000 100%);mask-image:linear-gradient(90deg,transparent 0,transparent 28%,#000 100%)}
+.kc .brand{white-space:nowrap;font-family:"Source Serif 4",Georgia,serif;font-weight:700;font-size:clamp(18px,5.2vw,23px);letter-spacing:-.01em;color:#EDE8D8;text-decoration:none}
+.kc .brand b{color:#F2A488;font-weight:600}
+.menu-btn{display:inline-flex;align-items:center;gap:9px;font:600 14px Inter,sans-serif;color:#EDE8D8;background:transparent;border:1.5px solid rgba(237,232,216,.5);border-radius:6px;padding:0 14px;min-height:44px;cursor:pointer}
+.menu-btn:hover{background:rgba(237,232,216,.1)}
 .menu-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
-.menu-panel{position:absolute;right:0;top:calc(100% + 8px);z-index:20;width:min(320px,calc(100vw - 32px));background:var(--panel);border:1px solid var(--panel-edge);border-radius:12px;padding:6px;display:flex;flex-direction:column;gap:2px}
+.menu-panel{position:absolute;right:max(calc((100% - 1000px)/2),16px);top:calc(100% + 8px);z-index:20;width:min(320px,calc(100vw - 32px));background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px;display:flex;flex-direction:column;gap:2px;box-shadow:0 10px 30px rgba(14,42,43,.18)}
 .menu-panel[hidden]{display:none}
-.menu-panel a{display:flex;flex-direction:column;gap:1px;padding:11px 12px;border-radius:8px;color:var(--fg);text-decoration:none;font-family:var(--font-display);font-weight:500;font-size:15px}
-.menu-panel a span{font-family:var(--font-body);font-weight:400;font-size:12.5px;color:var(--muted)}
-.menu-panel a:hover{background:rgba(139,155,200,.12)}
-.menu-panel a[]{background:rgba(61,230,255,.10);color:var(--acct)}
+.menu-panel a{display:flex;flex-direction:column;gap:1px;padding:11px 12px;border-radius:6px;color:#14211F;text-decoration:none;font:600 16px "Source Serif 4",Georgia,serif}
+.menu-panel a span{font:400 12.5px Inter,sans-serif;color:#51615E}
+.menu-panel a:hover{background:rgba(14,42,43,.06)}
+.menu-panel a[aria-current]{border-left:3px solid #E4572E;border-radius:0 6px 6px 0}
+.kc .menu-btn:focus-visible,.menu-panel a:focus-visible{outline:3px solid #E4572E;outline-offset:2px}
 header{display:flex;flex-direction:column;gap:6px}
-.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2)}
 h1{font-family:var(--font-display);font-weight:600;font-size:clamp(26px,4.4vw,38px);line-height:1.1;margin:0;letter-spacing:-.01em;text-wrap:balance}
-.sub{color:var(--muted);margin:0;max-width:62ch}
+.sub{color:var(--ink2);margin:0;max-width:62ch}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
 .kpi{background:var(--panel);border:1px solid var(--panel-edge);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:2px;min-width:0}
 .kpi .l{font-size:12px;color:var(--muted);letter-spacing:.04em}
 .kpi .v{font-family:var(--font-display);font-weight:600;font-size:30px;font-variant-numeric:tabular-nums;line-height:1.2;color:var(--fg)}
 .kpi .n{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
-.v.a{color:var(--acct)} .v.i{color:var(--idx)}
+.v.pos,.ratios td.pos{color:var(--pos)} .v.neg,.ratios td.neg{color:var(--neg)}
+.ratios td.pos,.ratios td.neg{font-weight:600}
 .card{background:var(--panel);border:1px solid var(--panel-edge);border-radius:14px;padding:18px 18px 12px;min-width:0}
 .card-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px 20px;margin-bottom:10px}
-h2{font-family:var(--font-display);font-weight:500;font-size:17px;margin:0}
+h2{font-family:var(--font-display);font-weight:500;font-size:17px;margin:0;color:var(--fg)}
 .legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12.5px;color:var(--muted)}
 .legend span{display:flex;align-items:center;gap:7px}
 .sw{width:18px;height:0;border-top:3px solid var(--acct);border-radius:2px}
 .sw.d{border-top-color:var(--idx)}
 .wrap{position:relative;width:100%}
 .w1{height:340px}.w2{height:210px}
-.note{font-size:12.5px;color:var(--muted);margin:0;max-width:78ch}
+.note{font-size:12.5px;color:var(--ink2);margin:0;max-width:78ch}
 .tbl{overflow-x:auto}
 .ratios{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
 .ratios th,.ratios td{padding:11px 8px;text-align:right;border-bottom:1px solid var(--panel-edge)}
@@ -82,20 +90,14 @@ h2{font-family:var(--font-display);font-weight:500;font-size:17px;margin:0}
 .ratios td.na{color:var(--muted);font-weight:400}
 .ratios .sub{display:block;font-family:var(--font-body);font-size:12px;font-weight:400;color:var(--muted);max-width:none}
 .ratios tbody tr:last-child td{border-bottom:0}
-.ratios tr.tot td{border-top:1px solid var(--muted)}
-.ratios tr.tot td:first-child{color:var(--fg);font-weight:500}
+.ratios tr.tot td{border-top:1px solid var(--muted);font-weight:700;font-size:17px}
+.ratios tr.tot td:first-child{color:var(--fg);font-weight:600;font-size:15px}
 @media (max-width:520px){.w1{height:280px}.kpi .v{font-size:26px}}
 </style>
 </head>
 <body>
+<div class="kc"><a class="brand" href="https://komodocap.github.io/performances">KomodoCap <b>· Performance</b></a><div><button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="menuPanel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>Menu</button><nav class="menu-panel" id="menuPanel" aria-label="Pages" hidden><a href="https://komodocap.github.io/performances">Performance Totale<span>Euros · courbes, tableaux et ratios depuis le 1er juillet</span></a><a href="https://komodocap.github.io/performances/stoxxonly" aria-current="page">Performance sur Indice - FESX / FSXE<span>Euros · courbes, tableaux et ratios depuis le 9 juillet</span></a></nav></div></div>
 <main>
-  <div class="topbar">
-    <div class="brand">KomodoCap</div>
-    <div>
-      <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="menuPanel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>Menu</button>
-      <nav class="menu-panel" id="menuPanel" aria-label="Pages" hidden><a href="https://komodocap.github.io/performances">Performance Totale<span>Euros · courbes, tableaux et ratios depuis le 1er juillet</span></a><a href="https://komodocap.github.io/performances/stoxxonly" aria-current="page">Performance sur Indice - FESX / FSXE<span>Euros · courbes, tableaux et ratios depuis le 9 juillet</span></a></nav>
-    </div>
-  </div>
   <header>
     <div class="eyebrow">9 juillet – 20 novembre 2026 · base 100 · en euros</div>
     <h1>Performance contre Euro Stoxx 50</h1>
@@ -103,10 +105,10 @@ h2{font-family:var(--font-display);font-weight:500;font-size:17px;margin:0}
   </header>
 
   <section class="kpis" aria-label="Chiffres clés">
-    <div class="kpi"><span class="l">Compte</span><span class="v a" id="k1">+20,0 %</span><span class="n">drawdown max −4,1 %</span></div>
-    <div class="kpi"><span class="l">Euro Stoxx 50</span><span class="v i" id="k2">−5,5 %</span><span class="n">drawdown max −9,4 %</span></div>
-    <div class="kpi"><span class="l">Écart de performance</span><span class="v" id="k3">+25,6 pts</span><span class="n">base 100 au 09/07</span></div>
-    <div class="kpi"><span class="l">Corrélation quotidienne</span><span class="v" id="k4">−0,24</span><span class="n">bêta −0,20</span></div>
+    <div class="kpi"><span class="l">Compte</span><span class="v pos" id="k1">+20,0 %</span><span class="n">drawdown max −4,1 %</span></div>
+    <div class="kpi"><span class="l">Euro Stoxx 50</span><span class="v neg" id="k2">−5,5 %</span><span class="n">drawdown max −9,4 %</span></div>
+    <div class="kpi"><span class="l">Écart de performance</span><span class="v pos" id="k3">+25,6 pts</span><span class="n">base 100 au 09/07</span></div>
+    <div class="kpi"><span class="l">Corrélation quotidienne</span><span class="v neg" id="k4">−0,24</span><span class="n">bêta −0,20</span></div>
   </section>
 
   <section class="card">
@@ -130,12 +132,12 @@ h2{font-family:var(--font-display);font-weight:500;font-size:17px;margin:0}
     <div class="tbl"><table class="ratios">
       <thead><tr><th></th><th>Compte</th><th>Euro Stoxx 50</th><th>Écart</th></tr></thead>
       <tbody>
-        <tr><td>Juillet (dès le 10)</td><td class="a">+2,82 %</td><td class="i">+1,17 %</td><td>+1,65 pts</td></tr>
-        <tr><td>Août</td><td class="a">+3,74 %</td><td class="i">+0,98 %</td><td>+2,77 pts</td></tr>
-        <tr><td>Septembre</td><td class="a">+3,64 %</td><td class="i">−2,35 %</td><td>+5,99 pts</td></tr>
-        <tr><td>Octobre</td><td class="a">+3,88 %</td><td class="i">−2,21 %</td><td>+6,09 pts</td></tr>
-        <tr><td>Novembre (au 20)</td><td class="a">+4,54 %</td><td class="i">−3,17 %</td><td>+7,70 pts</td></tr>
-        <tr class="tot"><td>Total depuis le 9 juillet</td><td class="a">+20,05 %</td><td class="i">−5,53 %</td><td>+25,58 pts</td></tr>
+        <tr><td>Juillet (dès le 10)</td><td class="pos">+2,82 %</td><td class="pos">+1,17 %</td><td>+1,65 pts</td></tr>
+        <tr><td>Août</td><td class="pos">+3,74 %</td><td class="pos">+0,98 %</td><td>+2,77 pts</td></tr>
+        <tr><td>Septembre</td><td class="pos">+3,64 %</td><td class="neg">−2,35 %</td><td>+5,99 pts</td></tr>
+        <tr><td>Octobre</td><td class="pos">+3,88 %</td><td class="neg">−2,21 %</td><td>+6,09 pts</td></tr>
+        <tr><td>Novembre (au 20)</td><td class="pos">+4,54 %</td><td class="neg">−3,17 %</td><td>+7,70 pts</td></tr>
+        <tr class="tot"><td>Total depuis le 9 juillet</td><td class="pos">+20,05 %</td><td class="neg">−5,53 %</td><td>+25,58 pts</td></tr>
       </tbody>
     </table></div>
   </section>
@@ -145,12 +147,12 @@ h2{font-family:var(--font-display);font-weight:500;font-size:17px;margin:0}
     <div class="tbl"><table class="ratios">
       <thead><tr><th></th><th>Compte</th><th>Euro Stoxx 50</th></tr></thead>
       <tbody>
-        <tr><td>Ratio de Sharpe</td><td class="a">4,33</td><td class="i">−1,02</td></tr>
-        <tr><td>Ratio de Sortino</td><td class="a">6,11</td><td class="i">−1,32</td></tr>
-        <tr><td>Volatilité annualisée</td><td class="a">11,2 %</td><td class="i">13,7 %</td></tr>
-        <tr><td>Volatilité à la baisse annualisée</td><td class="a">8,0 %</td><td class="i">10,6 %</td></tr>
-        <tr><td>Séances positives</td><td class="a">70,8 %</td><td class="i">52,1 %</td></tr>
-        <tr><td>Facteur de récupération</td><td class="a">3,77</td><td class="na">n/a</td></tr>
+        <tr><td>Ratio de Sharpe</td><td class="pos">4,33</td><td class="neg">−1,02</td></tr>
+        <tr><td>Ratio de Sortino</td><td class="pos">6,11</td><td class="neg">−1,32</td></tr>
+        <tr><td>Volatilité annualisée</td><td class="pos">11,2 %</td><td class="pos">13,7 %</td></tr>
+        <tr><td>Volatilité à la baisse annualisée</td><td class="pos">8,0 %</td><td class="pos">10,6 %</td></tr>
+        <tr><td>Séances positives</td><td class="pos">70,8 %</td><td class="pos">52,1 %</td></tr>
+        <tr><td>Facteur de récupération</td><td class="pos">3,77</td><td class="na">n/a</td></tr>
       </tbody>
     </table></div>
   </section>
@@ -160,11 +162,11 @@ h2{font-family:var(--font-display);font-weight:500;font-size:17px;margin:0}
     <div class="tbl"><table class="ratios">
       <thead><tr><th></th><th>Du 9 juillet au 20 novembre</th></tr></thead>
       <tbody>
-        <tr><td>Nombre de trades</td><td class="a">114<span class="sub">trades clôturés depuis le 10 juillet</span></td></tr>
-        <tr><td>Trades gagnants / perdants</td><td class="a">89 / 25<span class="sub">78,1 % de gagnants · ratio 3,56</span></td></tr>
-        <tr><td>Meilleur jour</td><td class="a">+322,34 €<span class="sub">17 nov · +3,56 % du capital</span></td></tr>
-        <tr><td>Pire jour</td><td class="a">−334,31 €<span class="sub">8 oct · −4,10 % du capital</span></td></tr>
-        <tr><td>Profit factor</td><td class="a">2,28<span class="sub">gains cumulés ÷ pertes cumulées</span></td></tr>
+        <tr><td>Nombre de trades</td><td class="pos">114<span class="sub">trades clôturés depuis le 10 juillet</span></td></tr>
+        <tr><td>Trades gagnants / perdants</td><td class="pos">89 / 25<span class="sub">78,1 % de gagnants · ratio 3,56</span></td></tr>
+        <tr><td>Meilleur jour</td><td class="pos">+322,34 €<span class="sub">17 nov · +3,56 % du capital</span></td></tr>
+        <tr><td>Pire jour</td><td class="neg">−334,31 €<span class="sub">8 oct · −4,10 % du capital</span></td></tr>
+        <tr><td>Profit factor</td><td class="pos">2,28<span class="sub">gains cumulés ÷ pertes cumulées</span></td></tr>
       </tbody>
     </table></div>
   </section>
@@ -180,7 +182,7 @@ const ix=[100.0, 99.77, 99.79, 99.93, 99.7, 99.99, 99.15, 99.09, 100.02, 100.52,
 const ddf=s=>{let pk=0;return s.map(x=>{if(x==null)return null;pk=Math.max(pk,x);return Math.round((x/pk-1)*10000)/100;});};
 const dA=ddf(acc),dI=ddf(ix);
 const fr=(v,d=2)=>v.toLocaleString('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d});
-const C={acct:'#3de6ff',idx:'#ff9d5c',grid:'rgba(139,155,200,0.12)',tick:'#8b9bc8'};
+const C={acct:'#ede8d8',idx:'#f28b65',grid:'rgba(163,178,172,0.12)',tick:'#a3b2ac'};
 Chart.defaults.font.family='Inter, system-ui, sans-serif';
 Chart.defaults.color=C.tick;
 
@@ -189,33 +191,33 @@ const gradFill=(color,top,bottom)=>ctx=>{
   const g=ctx.chart.ctx.createLinearGradient(0,a.top,0,a.bottom);
   g.addColorStop(0,top);g.addColorStop(1,bottom);return g;
 };
-const tip={backgroundColor:'#0b1635',borderColor:'#2a3d78',borderWidth:1,titleColor:'#e8eeff',bodyColor:'#c9d5ff',padding:10,cornerRadius:8,boxPadding:4,usePointStyle:true};
+const tip={backgroundColor:'#0a1f20',borderColor:'#2b5453',borderWidth:1,titleColor:'#f3f5f1',bodyColor:'#ede8d8',padding:10,cornerRadius:8,boxPadding:4,usePointStyle:true};
 const crosshair={id:'crosshair',afterDatasetsDraw(c){
   const t=c.tooltip; if(!t||!t.getActiveElements().length) return;
   const x=t.getActiveElements()[0].element.x,a=c.chartArea,g=c.ctx;
-  g.save();g.strokeStyle='rgba(232,238,255,.25)';g.lineWidth=1;g.setLineDash([3,3]);
+  g.save();g.strokeStyle='rgba(243,245,241,.25)';g.lineWidth=1;g.setLineDash([3,3]);
   g.beginPath();g.moveTo(x,a.top);g.lineTo(x,a.bottom);g.stroke();g.restore();}};
 const endDot=color=>({id:'endDot'+color,afterDatasetsDraw(c){
   const i=c.data.datasets.findIndex(d=>d.borderColor===color); if(i<0) return;
   const m=c.getDatasetMeta(i),p=m.data[m.data.length-1],g=c.ctx;
-  g.save();g.fillStyle=color;g.strokeStyle='#0e1938';g.lineWidth=2;
+  g.save();g.fillStyle=color;g.strokeStyle='#16393a';g.lineWidth=2;
   g.beginPath();g.arc(p.x,p.y,5,0,Math.PI*2);g.fill();g.stroke();g.restore();}});
 const base=(yopts,showX)=>({responsive:true,maintainAspectRatio:false,layout:{padding:{top:8,right:10,left:2}},
   interaction:{mode:'index',intersect:false},
   plugins:{legend:{display:false},tooltip:Object.assign({},tip,{callbacks:yopts.cb})},
-  scales:{x:{grid:{display:false},border:{color:'#1c2c5c'},ticks:showX?{color:C.tick,autoSkip:true,maxTicksLimit:12,maxRotation:0,font:{size:11}}:{display:false}},
+  scales:{x:{grid:{display:false},border:{color:'#2b5453'},ticks:showX?{color:C.tick,autoSkip:true,maxTicksLimit:12,maxRotation:0,font:{size:11}}:{display:false}},
           y:Object.assign({grid:{color:C.grid},border:{display:false},ticks:Object.assign({color:C.tick,font:{size:11}},yopts.ticks||{})}, yopts.scale)}});
 
 new Chart(document.getElementById('c1'),{type:'line',
   data:{labels,datasets:[
-    {label:'Compte',data:acc,borderColor:C.acct,borderWidth:2.5,tension:.25,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:C.acct,fill:'origin',backgroundColor:gradFill(C.acct,'rgba(61,230,255,0.32)','rgba(61,230,255,0)')},
+    {label:'Compte',data:acc,borderColor:C.acct,borderWidth:2.5,tension:.25,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:C.acct,fill:'origin',backgroundColor:gradFill(C.acct,'rgba(237,232,216,0.32)','rgba(237,232,216,0)')},
     {label:'Euro Stoxx 50',data:ix,borderColor:C.idx,borderWidth:2.5,tension:.25,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:C.idx,fill:false}]},
   options:base({scale:{min:92,max:124},cb:{label:c=>' '+c.dataset.label+' : '+fr(c.parsed.y)}},true),
   plugins:[crosshair,endDot(C.acct),endDot(C.idx)]});
 
 new Chart(document.getElementById('c2'),{type:'line',
   data:{labels,datasets:[
-    {label:'Compte',data:dA,borderColor:C.acct,borderWidth:2.5,tension:.2,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:C.acct,fill:'origin',backgroundColor:gradFill(C.acct,'rgba(61,230,255,0)','rgba(61,230,255,0.30)')},
+    {label:'Compte',data:dA,borderColor:C.acct,borderWidth:2.5,tension:.2,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:C.acct,fill:'origin',backgroundColor:gradFill(C.acct,'rgba(237,232,216,0)','rgba(237,232,216,0.30)')},
     {label:'Euro Stoxx 50',data:dI,borderColor:C.idx,borderWidth:2.5,tension:.2,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:C.idx,fill:false}]},
   options:base({scale:{min:-11,max:0},ticks:{callback:v=>v+' %'},cb:{label:c=>' '+c.dataset.label+' : '+fr(c.parsed.y)+' %'}},true),
   plugins:[crosshair]});
